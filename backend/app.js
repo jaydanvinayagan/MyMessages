@@ -4,7 +4,7 @@ const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
 //const Post = require('./models/post');
 
-const postsRoutes = require('./routes/post');
+const postsRoutes = require('./routes/posts');
 const app = express();
 
 mongoose.connect("mongodb+srv://JaydanVinayagan:hieDv1lNcotuxRTx@cluster0-e3viu.mongodb.net/test?retryWrites=true")
