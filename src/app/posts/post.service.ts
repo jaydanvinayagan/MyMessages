@@ -4,10 +4,11 @@ import { Subject } from "rxjs";
 import { map } from "rxjs/operators";
 import { Router } from "@angular/router";
 
-import { Post } from "./post.model";
 import { environment } from "../../environments/environment";
+import { Post } from "./post.model";
 
-const BACKEND_URL = environment.apiUrl + "/posts";
+const BACKEND_URL = environment.apiUrl + "/posts/";
+
 @Injectable({ providedIn: "root" })
 export class PostsService {
   private posts: Post[] = [];
@@ -15,11 +16,10 @@ export class PostsService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-
   getPosts(postsPerPage: number, currentPage: number) {
     const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`;
     this.http
-      .get<{ message: string; posts: Post[] ; maxPosts: number }>(
+      .get<{ message: string; posts: any; maxPosts: number }>(
         BACKEND_URL + queryParams
       )
       .pipe(
@@ -29,17 +29,17 @@ export class PostsService {
               return {
                 title: post.title,
                 content: post.content,
+                //@ts-ignore
                 id: post._id,
                 imagePath: post.imagePath,
                 creator: post.creator
-
               };
-            }), maxPosts: postData.maxPosts
+            }),
+            maxPosts: postData.maxPosts
           };
         })
       )
       .subscribe(transformedPostData => {
-        console.log(transformedPostData);
         this.posts = transformedPostData.posts;
         this.postsUpdated.next({
           posts: [...this.posts],
@@ -59,7 +59,7 @@ export class PostsService {
       content: string;
       imagePath: string;
       creator: string;
-    }>(BACKEND_URL+"/" + id);
+    }>(BACKEND_URL + id);
   }
 
   addPost(title: string, content: string, image: File) {
@@ -95,13 +95,13 @@ export class PostsService {
       };
     }
     this.http
-      .put(BACKEND_URL+"/" + id, postData)
+      .put(BACKEND_URL + id, postData)
       .subscribe(response => {
         this.router.navigate(["/"]);
       });
   }
 
   deletePost(postId: string) {
-    return this.http.delete(BACKEND_URL+"/" + postId);
+    return this.http.delete(BACKEND_URL + postId);
   }
 }
